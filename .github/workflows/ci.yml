@@ -31,7 +31,7 @@ jobs:
 
       - name: Compile Compact Circuit
         run: |
-          compact
+          compact update
           compact compile contracts/voting.compact src/services/midnight/managed/voting
 
       - name: Run Test Suite
