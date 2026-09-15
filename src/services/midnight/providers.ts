@@ -27,7 +27,7 @@ export const initializeProviders = async (logger: Logger) => {
   const shieldedAddresses = await connectedAPI.getShieldedAddresses();
 
   return {
-    userAddress: shieldedAddresses.shieldedCoinPublicKey,
+    userAddress: shieldedAddresses.shieldedAddress,
     privateStateProvider,
     zkConfigProvider: keyMaterialProvider,
     proofProvider: httpClientProofProvider(config.proverServerUri!, keyMaterialProvider),
