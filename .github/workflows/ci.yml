@@ -30,7 +30,9 @@ jobs:
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Compile Compact Circuit
-        run: compact compile contracts/voting.compact src/services/midnight/managed/voting
+        run: |
+          compact
+          compact compile contracts/voting.compact src/services/midnight/managed/voting
 
       - name: Run Test Suite
         run: npm run test
