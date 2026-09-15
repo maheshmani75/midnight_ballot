@@ -5,32 +5,14 @@ import CompactStandardLibrary;
 export ledger optionCount: Uint<8>;
 export ledger tally: Map<Uint<8>, Counter>;
 export ledger nullifiers: Set<Bytes<32>>;
-export ledger eligibilityRoot: Bytes<32>;
 export ledger pollOpen: Boolean;
 
 witness voterSecret(): Bytes<32>;
-witness merklePath(): Vector<5, Bytes<32>>;
-witness pathDirections(): Vector<5, Boolean>;
 witness chosenOption(): Uint<8>;
-
-circuit merkleRootFrom(
-  leaf: Bytes<32>,
-  path: Vector<5, Bytes<32>>,
-  directions: Vector<5, Boolean>
-): Bytes<32> {
-  const h0 = directions[0] ? persistentHash<Vector<2, Bytes<32>>>([path[0], leaf]) : persistentHash<Vector<2, Bytes<32>>>([leaf, path[0]]);
-  const h1 = directions[1] ? persistentHash<Vector<2, Bytes<32>>>([path[1], h0]) : persistentHash<Vector<2, Bytes<32>>>([h0, path[1]]);
-  const h2 = directions[2] ? persistentHash<Vector<2, Bytes<32>>>([path[2], h1]) : persistentHash<Vector<2, Bytes<32>>>([h1, path[2]]);
-  const h3 = directions[3] ? persistentHash<Vector<2, Bytes<32>>>([path[3], h2]) : persistentHash<Vector<2, Bytes<32>>>([h2, path[3]]);
-  const h4 = directions[4] ? persistentHash<Vector<2, Bytes<32>>>([path[4], h3]) : persistentHash<Vector<2, Bytes<32>>>([h3, path[4]]);
-  return h4;
-}
-
-constructor(numOptions: Uint<8>, root: Bytes<32>) {
+constructor(numOptions: Uint<8>) {
   assert(numOptions > 0, "poll must have at least one option");
   assert(numOptions <= 32, "too many options");
   optionCount = disclose(numOptions);
-  eligibilityRoot = disclose(root);
   pollOpen = true;
 }
 
@@ -38,15 +20,9 @@ export circuit castVote(): [] {
   assert(pollOpen, "poll is closed");
 
   const secret = voterSecret();
-  const path = merklePath();
-  const directions = pathDirections();
   const option = chosenOption();
 
   assert(option < optionCount, "invalid option index");
-
-  const leaf = persistentHash<Vector<2, Bytes<32>>>([pad(32, "leaf"), secret]);
-  const computedRoot = merkleRootFrom(leaf, path, directions);
-  assert(computedRoot == eligibilityRoot, "not an eligible voter");
 
   const nullifier = persistentHash<Vector<2, Bytes<32>>>([pad(32, "null"), secret]);
   assert(!nullifiers.member(disclose(nullifier)), "this voter has already voted");

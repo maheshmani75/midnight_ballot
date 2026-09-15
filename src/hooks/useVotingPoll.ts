@@ -84,10 +84,16 @@ export function useVotingPoll() {
     setStatus("generating-proof");
     
     try {
-      // In a real app we'd need the voter's actual secret and Merkle path
-      // Here we just use a dummy private state for demonstration purposes since we don't have the user's secret
-      
       setStatus("submitting");
+      
+      const secret = new Uint8Array(32);
+      globalThis.crypto.getRandomValues(secret);
+      
+      await providers.privateStateProvider.set("voter", {
+        secretKey: secret,
+        selectedOption: BigInt(selected),
+      });
+
       const tx = await contract.callTx.castVote();
       const txHash = tx.public.txHash;
       

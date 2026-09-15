@@ -142,11 +142,9 @@ async function main() {
   console.log("Deploying contract...");
   let success = false;
   try {
-    const initialRoot = new Uint8Array(32); // 32 bytes of zeros
-    
     const deployed = await deployContract(providers, {
         compiledContract: CompiledVotingContract,
-        args: [2n, initialRoot]
+        args: [3n]
     });
     
     const contractAddress = deployed.deployTxData.public.contractAddress;
