@@ -12,7 +12,11 @@ export const witnesses = {
   ],
   merklePath: ({ privateState }: WitnessContext<Ledger, VotingPrivateState>): [VotingPrivateState, any] => [
     privateState,
-    new Array(10).fill(new Uint8Array(32)),
+    new Array(5).fill(new Uint8Array(32)),
+  ],
+  pathDirections: ({ privateState }: WitnessContext<Ledger, VotingPrivateState>): [VotingPrivateState, any] => [
+    privateState,
+    new Array(5).fill(false),
   ],
   chosenOption: ({ privateState }: WitnessContext<Ledger, VotingPrivateState>): [VotingPrivateState, bigint] => [
     privateState,
