@@ -19,6 +19,7 @@ function App() {
     selected,
     setSelected,
     connectWallet,
+    disconnectWallet,
     castVote,
     pollOpen,
   } = useVotingPoll();
@@ -30,7 +31,7 @@ function App() {
           <Moon className="h-5 w-5 text-[var(--violet)]" />
           <span className="font-display text-lg">Midnight Ballot</span>
         </div>
-        <WalletButton status={wallet} onConnect={connectWallet} />
+        <WalletButton status={wallet} onConnect={connectWallet} onDisconnect={disconnectWallet} />
       </header>
 
       <main className="mx-auto max-w-5xl px-6 pb-16 pt-6">

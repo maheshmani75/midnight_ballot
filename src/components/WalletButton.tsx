@@ -1,18 +1,24 @@
-import { Wallet, Loader2, CircleCheck } from "lucide-react";
-import type { WalletStatus } from "../hooks/useVotingPoll";
+import { WalletStatus } from "../hooks/useVotingPoll";
+import { Loader2, CircleCheck } from "lucide-react";
 
 export function WalletButton({
   status,
   onConnect,
+  onDisconnect,
 }: {
   status: WalletStatus;
   onConnect: () => void;
+  onDisconnect?: () => void;
 }) {
   if (status === "connected") {
     return (
-      <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/80">
+      <div 
+        className="flex cursor-pointer select-none items-center gap-2 rounded-full border border-[var(--violet)] bg-[var(--violet)]/10 px-4 py-2 text-sm text-[var(--violet)] hover:bg-[var(--violet)]/20 transition-colors"
+        onClick={onDisconnect}
+        title="Disconnect wallet"
+      >
         <CircleCheck className="h-4 w-4 text-[var(--violet)]" />
-        <span className="font-mono">lace_a3f…9c2</span>
+        <span className="font-mono">Connected (Click to disconnect)</span>
       </div>
     );
   }
@@ -21,14 +27,16 @@ export function WalletButton({
     <button
       onClick={onConnect}
       disabled={status === "connecting"}
-      className="flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/15 disabled:opacity-60"
+      className="group relative flex items-center gap-2 overflow-hidden rounded-full bg-white px-5 py-2 text-sm font-medium text-black transition-transform hover:scale-105 active:scale-95 disabled:pointer-events-none disabled:opacity-70"
     >
       {status === "connecting" ? (
-        <Loader2 className="h-4 w-4 animate-spin" />
+        <>
+          <Loader2 className="h-4 w-4 animate-spin" />
+          Connecting
+        </>
       ) : (
-        <Wallet className="h-4 w-4" />
+        "Connect Wallet"
       )}
-      {status === "connecting" ? "Connecting…" : "Connect wallet"}
     </button>
   );
 }

@@ -98,7 +98,9 @@ export function BallotCard({
           <p className="font-medium">Ballot recorded — thank you.</p>
           <p className="mt-1 flex items-center gap-1.5 text-xs text-emerald-900/70">
             <Fingerprint className="h-3.5 w-3.5" />
-            <span className="font-mono">nullifier {myNullifier.slice(0, 12)}…</span>
+            <a href={myNullifier} target="_blank" rel="noreferrer" className="font-mono hover:underline text-emerald-700">
+              View transaction on Explorer
+            </a>
           </p>
         </div>
       )}

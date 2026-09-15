@@ -11,7 +11,7 @@
 
 | Network | Address |
 |---------|---------|
-| Preprod | `PASTE_YOUR_PREPROD_CONTRACT_ADDRESS_HERE` |
+| Preprod | `abc9f04d0ff71bec8e4347f63f0259c2bf68bbd49fd1fb8a18739081e22aab71` |
 
 ## What This Does
 
