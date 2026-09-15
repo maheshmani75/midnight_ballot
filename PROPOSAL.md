@@ -8,12 +8,10 @@
 chain could not do well for this product?]
 
 ## Data Model
-| Data Point              | Type            | Disclosed To |
-|--------------------------|-----------------|--------------|
-| Per-option vote tally     | Public ledger   | Everyone     |
-| Voter's chosen option     | Private witness | No one       |
-| Voter's eligibility secret | Private witness | No one       |
-| Vote nullifier             | Public ledger   | Everyone (opaque, unlinkable) |
+| Data Point       | Type           | Disclosed To |
+|------------------|----------------|--------------|
+| [example]        | Public ledger  | Everyone     |
+| [example]        | Private witness| No one       |
 [I WILL FILL IN THE ROWS]
 
 ## Mainnet Feasibility

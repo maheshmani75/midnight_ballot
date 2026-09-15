@@ -13,10 +13,6 @@ export default defineConfig({
     tailwindcss(),
     wasm()
   ],
-  test: {
-    environment: 'jsdom',
-    globals: true,
-  },
   optimizeDeps: {
     esbuildOptions: {
       target: 'es2022'

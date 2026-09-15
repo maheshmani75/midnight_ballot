@@ -1,6 +1,6 @@
 # Midnight Ballot
 
-![CI](https://github.com/YOUR_USERNAME/YOUR_REPO/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/maheshmani75/midnight_ballot/actions/workflows/ci.yml/badge.svg)
 
 > Anonymous ballots, publicly verifiable tallies — private voting on Midnight.
 
@@ -95,7 +95,7 @@ npm test
 
 10 tests covering circuit logic, ledger state transitions, and the privacy
 guarantee (the chosen option and voter secret never surface in public state,
-errors, or nullifiers). See `tests/counter.test.ts`.
+errors, or nullifiers). See `tests/voting.test.ts`.
 
 ## CI/CD
 
