@@ -5,7 +5,7 @@ import { TallyBoard } from "./components/TallyBoard";
 import { useVotingPoll } from "./hooks/useVotingPoll";
 
 const CONTRACT_ADDRESS =
-  import.meta.env.VITE_CONTRACT_ADDRESS ?? "PASTE_YOUR_PREPROD_ADDRESS_HERE";
+  import.meta.env.VITE_CONTRACT_ADDRESS ?? "abc9f04d0ff71bec8e4347f63f0259c2bf68bbd49fd1fb8a18739081e22aab71";
 
 function App() {
   const {
