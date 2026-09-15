@@ -1,9 +1,7 @@
 import { ConnectedAPI, type InitialAPI } from '@midnight-ntwrk/dapp-connector-api';
-import semver from 'semver';
 import { catchError, concatMap, filter, firstValueFrom, interval, map, take, tap, throwError, timeout } from 'rxjs';
 import { pipe as fnPipe } from 'fp-ts/function';
 import { type Logger } from 'pino';
-const COMPATIBLE_CONNECTOR_API_VERSION = '1.x';
 const WALLET_CONNECT_TIMEOUT_MS = 30000;
 const WALLET_DISCOVERY_POLL_INTERVAL_MS = 1000;
 const WALLET_DISCOVERY_TIMEOUT_MS = 5000;
