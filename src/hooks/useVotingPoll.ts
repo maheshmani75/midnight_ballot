@@ -48,6 +48,7 @@ export function useVotingPoll() {
       localStorage.setItem("walletConnected", "true");
     } catch (err: any) {
       console.error(err);
+      setError(err.message || "Failed to connect to wallet.");
       setWallet("disconnected");
       localStorage.removeItem("walletConnected");
     }

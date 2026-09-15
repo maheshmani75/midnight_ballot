@@ -28,7 +28,7 @@ export const initializeProviders = async (logger: Logger) => {
     privateStateProvider,
     zkConfigProvider: keyMaterialProvider,
     proofProvider: httpClientProofProvider(config.proverServerUri!, keyMaterialProvider),
-    publicDataProvider: indexerPublicDataProvider(config.indexerUri, config.indexerWsUri),
+    publicDataProvider: indexerPublicDataProvider(config.indexerUri, config.indexerWsUri, globalThis.WebSocket as any),
     walletProvider: {
       getCoinPublicKey(): string {
         return shieldedAddresses.shieldedCoinPublicKey;
