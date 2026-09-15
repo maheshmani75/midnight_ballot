@@ -61,7 +61,7 @@ jobs:
           npx tsx src/launcher/deploy-voting.ts
         env:
           NODE_OPTIONS: "--max-old-space-size=8192 --expose-gc"
-          WALLET_SEED: "diet much novel mirror solution claw opera derive improve believe own moon rent deal cycle aerobic collect tower alcohol marriage dragon clown hope fat"
+          WALLET_SEED: "3db2225c46ccec5426d1db7202967847cb64704db0212d9cc418442420581b5a"
 
       - name: Upload Deployment Info
         if: always()
