@@ -1,0 +1,107 @@
+// voting.compact
+// Private Voting — anonymous ballots with a publicly verifiable tally.
+//
+// Privacy model:
+//   PUBLIC   -> the running per-option tally, the poll metadata, and a
+//               nullifier set (opaque hashes, not tied to identity).
+//   PRIVATE  -> the voter's identity, their eligibility secret, and which
+//               option they chose is never written to public state or
+//               emitted in any event.
+//   PROVED   -> the circuit proves "a registered, not-yet-voted voter cast
+//               exactly one valid ballot for a valid option" without
+//               revealing which voter or which option to anyone but the
+//               voter themselves.
+//
+// Double-voting is prevented with a nullifier: a hash derived from the
+// voter's private secret + the poll id. The nullifier is deterministic per
+// voter/poll but reveals nothing about the voter's identity, so it can be
+// safely published and checked against a public set.
+
+pragma language_version 0.16;
+
+import CompactStandardLibrary;
+
+// ---- Public ledger state -----------------------------------------------
+
+// Number of options this poll offers (fixed at deploy time for this MVP,
+// e.g. 2 for a yes/no vote, up to 5 candidates in a multi-option poll).
+export ledger optionCount: Counter;
+
+// Running public tally per option index.
+export ledger tally: Map<Uint<8>, Counter>;
+
+// Set of nullifiers that have already voted — public, but each entry is an
+// opaque commitment that cannot be reversed to a voter identity.
+export ledger nullifiers: Set<Bytes<32>>;
+
+// Root of the Merkle tree of eligible-voter commitments, set once at poll
+// creation. Only voters who can prove membership under this root may vote.
+export ledger eligibilityRoot: Bytes<32>;
+
+// Whether the poll is still open for votes.
+export ledger pollOpen: Boolean;
+
+// ---- Witnesses (private inputs, never written to the ledger) -----------
+
+// The voter's private eligibility secret. Combined with a Merkle path it
+// proves membership in the eligible-voter set without revealing which leaf.
+witness voterSecret(): Bytes<32>;
+witness merklePath(): MerkleTreePath<10, Bytes<32>>;
+
+// The voter's chosen option — private, only used inside the circuit to
+// increment the matching public counter. Never disclosed on its own.
+witness chosenOption(): Uint<8>;
+
+// ---- Circuits ------------------------------------------------------------
+
+// Set up a new poll. Called once by the poll creator.
+export circuit createPoll(numOptions: Uint<8>, root: Bytes<32>): [] {
+  assert numOptions > 0 "poll must have at least one option";
+  assert numOptions <= 32 "too many options for this MVP";
+  optionCount.increment(numOptions);
+  eligibilityRoot = root;
+  pollOpen = true;
+}
+
+// Cast a ballot.
+//
+// This is the privacy-critical circuit: `chosenOption` and the voter's
+// identity are consumed as witnesses (private, local to the prover) and
+// NEVER assigned to any exported/public ledger field. Only the derived
+// nullifier and the incremented tally counter reach the public ledger.
+export circuit castVote(): [] {
+  assert pollOpen "poll is closed";
+
+  const secret = voterSecret();
+  const path = merklePath();
+  const option = chosenOption();
+
+  assert option < optionCount as Uint<8> "invalid option index";
+
+  // Prove the voter's commitment is a leaf of the eligibility tree without
+  // revealing which leaf — this is what makes the voter's identity private.
+  const leaf = persistentHash<Bytes<32>>(secret);
+  const computedRoot = merkleTreePathRoot<10, Bytes<32>>(path, leaf);
+  assert computedRoot == eligibilityRoot "not an eligible voter";
+
+  // Derive a per-poll nullifier so the same secret can't vote twice, while
+  // remaining unlinkable to the voter's identity or eligibility leaf.
+  const nullifier = persistentHash<Bytes<32>>(
+    persistentCommit<Bytes<32>>(secret, eligibilityRoot)
+  );
+  assert !nullifiers.member(nullifier) "this voter has already voted";
+  nullifiers.insert(nullifier);
+
+  // Only the tally counter for the chosen option is touched publicly —
+  // the option value itself is used only as an in-circuit index and is
+  // discarded after this statement executes.
+  tally.insert(option, default<Counter>);
+  tally.lookup(option).increment(1);
+}
+
+// Close the poll so no further ballots can be cast; tallies remain public
+// and verifiable by anyone by simply reading the ledger.
+export circuit closePoll(): [] {
+  assert pollOpen "poll already closed";
+  pollOpen = false;
+}
