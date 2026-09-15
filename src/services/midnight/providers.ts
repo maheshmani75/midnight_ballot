@@ -15,8 +15,10 @@ import { type Logger } from 'pino';
 import { connectToWallet } from './wallet.js';
 import { inMemoryPrivateStateProvider } from './in-memory-private-state-provider.js';
 import { VotingPrivateState } from './witnesses.js';
+import { setNetworkId } from '@midnight-ntwrk/midnight-js-network-id';
 
 export const initializeProviders = async (logger: Logger) => {
+  setNetworkId('preprod');
   const connectedAPI = await connectToWallet(logger, "preprod");
   const zkConfigPath = window.location.origin;
   const keyMaterialProvider = new FetchZkConfigProvider(zkConfigPath, fetch.bind(window));
@@ -25,6 +27,7 @@ export const initializeProviders = async (logger: Logger) => {
   const shieldedAddresses = await connectedAPI.getShieldedAddresses();
 
   return {
+    userAddress: shieldedAddresses.shieldedCoinPublicKey,
     privateStateProvider,
     zkConfigProvider: keyMaterialProvider,
     proofProvider: httpClientProofProvider(config.proverServerUri!, keyMaterialProvider),

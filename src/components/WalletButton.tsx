@@ -3,14 +3,19 @@ import { Loader2, CircleCheck } from "lucide-react";
 
 export function WalletButton({
   status,
+  userAddress,
   onConnect,
   onDisconnect,
 }: {
   status: WalletStatus;
+  userAddress?: string | null;
   onConnect: () => void;
   onDisconnect?: () => void;
 }) {
   if (status === "connected") {
+    const displayAddr = userAddress 
+      ? `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`
+      : "Connected";
     return (
       <div 
         className="flex cursor-pointer select-none items-center gap-2 rounded-full border border-[var(--violet)] bg-[var(--violet)]/10 px-4 py-2 text-sm text-[var(--violet)] hover:bg-[var(--violet)]/20 transition-colors"
@@ -18,7 +23,7 @@ export function WalletButton({
         title="Disconnect wallet"
       >
         <CircleCheck className="h-4 w-4 text-[var(--violet)]" />
-        <span className="font-mono">Connected (Click to disconnect)</span>
+        <span className="font-mono">{displayAddr}</span>
       </div>
     );
   }

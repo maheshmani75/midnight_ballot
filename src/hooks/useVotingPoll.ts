@@ -25,6 +25,7 @@ export function useVotingPoll() {
   const [status, setStatus] = useState<VoteStatus>("idle");
   const [error, setError] = useState<string | null>(null);
   const [myNullifier, setMyNullifier] = useState<string | null>(null);
+  const [userAddress, setUserAddress] = useState<string | null>(null);
   const [selected, setSelected] = useState<number | null>(null);
   const [providers, setProviders] = useState<any>(null);
   const [contract, setContract] = useState<any>(null);
@@ -34,6 +35,7 @@ export function useVotingPoll() {
       setWallet("connecting");
       const provs = await initializeProviders(logger);
       setProviders(provs);
+      setUserAddress(provs.userAddress);
       
       const foundContract = await findDeployedContract(provs, {
         contractAddress: CONTRACT_ADDRESS,
@@ -68,6 +70,7 @@ export function useVotingPoll() {
     setWallet("disconnected");
     localStorage.removeItem("walletConnected");
     setProviders(null);
+    setUserAddress(null);
     setContract(null);
   }, []);
 
@@ -111,6 +114,7 @@ export function useVotingPoll() {
     ballotsCast,
     pollOpen,
     wallet,
+    userAddress,
     status,
     error,
     myNullifier,

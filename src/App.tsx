@@ -12,7 +12,9 @@ function App() {
     options,
     tally,
     totalVotes,
+    pollOpen,
     wallet,
+    userAddress,
     status,
     error,
     myNullifier,
@@ -21,17 +23,17 @@ function App() {
     connectWallet,
     disconnectWallet,
     castVote,
-    pollOpen,
   } = useVotingPoll();
 
   return (
-    <div className="min-h-full bg-[var(--dusk)]">
-      <header className="mx-auto flex max-w-5xl items-center justify-between px-6 py-6">
-        <div className="flex items-center gap-2 text-white">
-          <Moon className="h-5 w-5 text-[var(--violet)]" />
-          <span className="font-display text-lg">Midnight Ballot</span>
+    <div className="min-h-screen bg-[var(--void)] text-white selection:bg-[var(--violet)]/30 font-sans">
+      {/* Header */}
+      <header className="mx-auto flex max-w-6xl items-center justify-between p-6">
+        <div className="flex items-center gap-2">
+          <Moon className="h-6 w-6 text-[var(--violet)]" />
+          <span className="font-display text-xl font-medium tracking-wide">Midnight Ballot</span>
         </div>
-        <WalletButton status={wallet} onConnect={connectWallet} onDisconnect={disconnectWallet} />
+        <WalletButton status={wallet} userAddress={userAddress} onConnect={connectWallet} onDisconnect={disconnectWallet} />
       </header>
 
       <main className="mx-auto max-w-5xl px-6 pb-16 pt-6">
