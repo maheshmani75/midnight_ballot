@@ -138,7 +138,10 @@ export class MidnightWalletProvider implements MidnightProvider, WalletProvider 
       },
     };
 
-    const seeds = seed ? WalletSeeds.fromMasterSeed(seed) : WalletSeeds.generateRandom();
+    // Use fromMnemonic for BIP39 mnemonic phrases (contains spaces), fromMasterSeed for hex seeds
+    const seeds = seed
+      ? (seed.includes(' ') ? WalletSeeds.fromMnemonic(seed) : WalletSeeds.fromMasterSeed(seed))
+      : WalletSeeds.generateRandom();
     const keystore = createKeystore(seeds.unshielded, env.walletNetworkId as any);
 
     const unshieldedWallet = WalletFactory.createUnshieldedWallet(walletConfig as any, keystore);
