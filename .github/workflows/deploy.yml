@@ -31,9 +31,10 @@ jobs:
 
       - name: Install dependencies (CLI)
         run: |
-          cd preprod-deployment/cli
+          cd preprod-deployment
           npm install
           npm install --no-save tsx
+          node infra/scripts/patch-wallet-sdk.mjs
 
       - name: Increase swap space
         run: |
