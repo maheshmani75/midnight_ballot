@@ -158,7 +158,7 @@ async function main() {
 
     const deployed = await deployContract(providers, {
         compiledContract: resolvedContract,
-        args: [3n, new Uint8Array(32)]
+        args: [3n]
     });
     
     const contractAddress = deployed.deployTxData.public.contractAddress;
