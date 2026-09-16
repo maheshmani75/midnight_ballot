@@ -14,37 +14,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
 
-      - name: Install dependencies
-        run: |
-          cd preprod-deployment
-          npm install
-          npm install --no-save tsx
-          node infra/scripts/patch-wallet-sdk.mjs
-
-      - name: Copy Contract
-        run: |
-          cp contracts/voting.compact preprod-deployment/contracts/src/voting.compact
+      - name: Install dependencies (root)
+        run: npm install
 
       - name: Compile Contract
         run: |
           curl --proto '=https' --tlsv1.2 -LsSf https://github.com/midnightntwrk/compact/releases/latest/download/compact-installer.sh | sh
           export PATH="$HOME/.local/bin:$PATH"
-          compact update 0.31.1 || compact update 0.31.0
-          compact --version
-          cd preprod-deployment/contracts
-          compact compile src/voting.compact ./src/managed/voting
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-      - name: Build Contract Bindings
+          compact update
+          compact compile contracts/voting.compact src/services/midnight/managed/voting
+
+      - name: Install dependencies (CLI)
         run: |
-          cd preprod-deployment/contracts
-          npm run build
-          
+          cd preprod-deployment/cli
+          npm install
+          npm install --no-save tsx
+
       - name: Increase swap space
         run: |
           sudo swapoff -a || true
@@ -53,7 +43,6 @@ jobs:
           sudo chmod 600 /swapfile_extra
           sudo mkswap /swapfile_extra
           sudo swapon /swapfile_extra
-          free -h
 
       - name: Deploy Contract
         run: |
@@ -61,7 +50,7 @@ jobs:
           npx tsx src/launcher/deploy-voting.ts
         env:
           NODE_OPTIONS: "--max-old-space-size=8192 --expose-gc"
-          WALLET_SEED: "3db2225c46ccec5426d1db7202967847cb64704db0212d9cc418442420581b5a"
+          WALLET_SEED: ${{ secrets.WALLET_SEED }}
 
       - name: Upload Deployment Info
         if: always()

@@ -3,19 +3,21 @@ globalThis.WebSocket = WebSocket as unknown as typeof globalThis.WebSocket;
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { PreprodRemoteConfig } from '../config.js';
 import { MidnightWalletProvider } from '../midnight-wallet-provider.js';
 import { NodeZkConfigProvider } from '@midnight-ntwrk/midnight-js-node-zk-config-provider';
 import { indexerPublicDataProvider } from '@midnight-ntwrk/midnight-js-indexer-public-data-provider';
 import { httpClientProofProvider } from '@midnight-ntwrk/midnight-js-http-client-proof-provider';
 import { levelPrivateStateProvider } from '@midnight-ntwrk/midnight-js-level-private-state-provider';
 import { deployContract } from '@midnight-ntwrk/midnight-js-contracts';
-import { CompiledVotingContract } from '@midnight-ntwrk/voting-contract';
+import { Contract } from '../../../../src/services/midnight/managed/voting/contract/index.js';
+import { witnesses } from '../../../../src/services/midnight/witnesses.js';
+import { CompiledContract } from '@midnight-ntwrk/midnight-js-protocol/compact-js';
 import { createLogger } from '../logger-utils.js';
 import { getUnshieldedAddress } from '../wallet-utils.js';
 import { generateDust } from '../generate-dust.js';
 import { unshieldedToken } from '@midnight-ntwrk/midnight-js-protocol/ledger';
 import { FaucetClient } from '@midnight-ntwrk/testkit-js';
+import { setNetworkId } from '@midnight-ntwrk/midnight-js-network-id';
 import * as Rx from 'rxjs';
 
 async function main() {
@@ -23,24 +25,23 @@ async function main() {
   const seed = process.env.WALLET_SEED;
   if (!seed) throw new Error("WALLET_SEED environment variable is required");
   
-  const config = new PreprodRemoteConfig();
-  const logger = await createLogger(config.logDir, false);
-  const testEnv = config.getEnvironment(logger);
-  console.log("Starting environment...");
-  let envConfiguration: any;
-  try {
-    envConfiguration = await testEnv.start();
-  } catch (err: any) {
-    try {
-      envConfiguration = testEnv.getEnvironmentConfiguration();
-      console.warn("Notice: Public faucet is temporarily offline (503), but node, indexer, and proof server are healthy. Continuing with funded wallet...");
-    } catch {
-      throw err;
-    }
-  }
+  setNetworkId('preprod');
+  
+  const logger = await createLogger('./logs/deploy.log', false);
+
+  const envConfiguration = {
+    walletNetworkId: 'preprod',
+    networkId: 'preprod',
+    indexer: 'https://indexer.preprod.midnight.network/api/v4/graphql',
+    indexerWS: 'wss://indexer.preprod.midnight.network/api/v4/graphql/ws',
+    node: 'https://rpc.preprod.midnight.network',
+    nodeWS: 'wss://rpc.preprod.midnight.network',
+    proofServer: 'http://127.0.0.1:6300',
+    faucet: 'https://midnight-tmnight-preprod.nethermind.dev/',
+  };
   
   console.log("Building wallet provider...");
-  const walletProvider = await MidnightWalletProvider.build(logger, envConfiguration, seed);
+  const walletProvider = await MidnightWalletProvider.build(logger, envConfiguration as any, seed);
   await walletProvider.start();
   
   const walletAddress = await getUnshieldedAddress(logger, walletProvider.wallet);
@@ -101,7 +102,7 @@ async function main() {
   console.log("DUST wallet fully synchronized!");
 
   console.log("Checking / Registering DUST generation...");
-  const dustTx = await generateDust(logger, seed, unshieldedState, walletProvider.wallet);
+  const dustTx = await generateDust(logger, walletProvider.unshieldedKeystore, unshieldedState, walletProvider.wallet);
   if (dustTx) {
     console.log(`Registered DUST generation tx: ${dustTx}`);
     console.log("Waiting for registered UTXO to be included in block...");
@@ -122,13 +123,13 @@ async function main() {
   console.log(`DUST available: ${dustBalance}! Deploying contract...`);
 
   console.log("Initializing providers...");
-  const zkConfigProvider = new NodeZkConfigProvider(config.zkConfigPath);
+  const zkConfigProvider = new NodeZkConfigProvider('../../public/keys');
   const storagePassword = "TempPassword123!Secure";
   
   const providers = {
     privateStateProvider: levelPrivateStateProvider({
-      privateStateStoreName: config.privateStateStoreName,
-      signingKeyStoreName: `${config.privateStateStoreName}-signing-keys`,
+      privateStateStoreName: 'voting-private-state',
+      signingKeyStoreName: `voting-private-state-signing-keys`,
       privateStoragePasswordProvider: () => storagePassword,
       accountId: seed,
     }),
@@ -142,9 +143,22 @@ async function main() {
   console.log("Deploying contract...");
   let success = false;
   try {
+    class ContractWrapper extends Contract<any, any> {
+      constructor() {
+        super(witnesses);
+      }
+    }
+
+    const resolvedContract = CompiledContract.make(
+      "voting",
+      ContractWrapper as any
+    ).pipe(
+      CompiledContract.withCompiledFileAssets(path.resolve('../../src/services/midnight/managed/voting'))
+    );
+
     const deployed = await deployContract(providers, {
-        compiledContract: CompiledVotingContract,
-        args: [3n]
+        compiledContract: resolvedContract,
+        args: [3n, new Uint8Array(32)]
     });
     
     const contractAddress = deployed.deployTxData.public.contractAddress;
@@ -171,7 +185,6 @@ async function main() {
     console.error("Deployment failed:", err);
   } finally {
     await walletProvider.stop();
-    await testEnv.shutdown();
     process.exit(success ? 0 : 1);
   }
 }

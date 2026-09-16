@@ -22,33 +22,14 @@ import { HDWallet, Roles } from '@midnight-ntwrk/wallet-sdk-hd';
 import { getNetworkId } from '@midnight-ntwrk/midnight-js-network-id';
 import * as rx from 'rxjs';
 
-export const getUnshieldedSeed = (seed: string): Uint8Array<ArrayBufferLike> => {
-  const seedBuffer = Buffer.from(seed, 'hex');
-  const hdWalletResult = HDWallet.fromSeed(seedBuffer);
-
-  const { hdWallet } = hdWalletResult as {
-    type: 'seedOk';
-    hdWallet: HDWallet;
-  };
-
-  const derivationResult = hdWallet.selectAccount(0).selectRole(Roles.NightExternal).deriveKeyAt(0);
-
-  if (derivationResult.type === 'keyOutOfBounds') {
-    throw new Error('Key derivation out of bounds');
-  }
-
-  return derivationResult.key;
-};
 
 export const generateDust = async (
   logger: Logger,
-  walletSeed: string,
+  unshieldedKeystore: any,
   unshieldedState: UnshieldedWalletState,
   walletFacade: WalletFacade,
 ) => {
   const dustAddress = await walletFacade.dust.getAddress();
-  const networkId = getNetworkId();
-  const unshieldedKeystore = createKeystore(getUnshieldedSeed(walletSeed), networkId);
   const utxos = unshieldedState.availableCoins.filter((coin) => !coin.meta.registeredForDustGeneration);
 
   if (utxos.length === 0) {
