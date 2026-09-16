@@ -26,7 +26,7 @@ jobs:
         run: |
           curl --proto '=https' --tlsv1.2 -LsSf https://github.com/midnightntwrk/compact/releases/latest/download/compact-installer.sh | sh
           export PATH="$HOME/.local/bin:$PATH"
-          compact update
+          compact update 0.31.1 || compact update 0.31.0
           compact compile contracts/voting.compact src/services/midnight/managed/voting
 
       - name: Install dependencies (CLI)
