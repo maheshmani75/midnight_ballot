@@ -125,9 +125,14 @@ async function main() {
   console.log("Initializing providers...");
   const baseZkConfigProvider = new NodeZkConfigProvider('../../public/keys');
   const zkConfigProvider = {
-    getZkConfig(circuitId: string) {
-      const parsedCircuitId = circuitId.split('#').pop() || circuitId;
-      return baseZkConfigProvider.getZkConfig(parsedCircuitId);
+    getProverKey(circuitId: string) {
+      return baseZkConfigProvider.getProverKey(circuitId.split('#').pop() || circuitId);
+    },
+    getVerifierKey(circuitId: string) {
+      return baseZkConfigProvider.getVerifierKey(circuitId.split('#').pop() || circuitId);
+    },
+    getZKIR(circuitId: string) {
+      return baseZkConfigProvider.getZKIR(circuitId.split('#').pop() || circuitId);
     }
   };
   const storagePassword = "TempPassword123!Secure";

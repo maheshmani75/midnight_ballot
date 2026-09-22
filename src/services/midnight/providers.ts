@@ -23,9 +23,14 @@ export const initializeProviders = async (logger: Logger) => {
   const zkConfigPath = window.location.origin;
   const fetchZkConfigProvider = new FetchZkConfigProvider(zkConfigPath, fetch.bind(window));
   const keyMaterialProvider = {
-    getZkConfig(circuitId: string) {
-      const parsedCircuitId = circuitId.split('#').pop() || circuitId;
-      return fetchZkConfigProvider.getZkConfig(parsedCircuitId);
+    getProverKey(circuitId: string) {
+      return fetchZkConfigProvider.getProverKey(circuitId.split('#').pop() || circuitId);
+    },
+    getVerifierKey(circuitId: string) {
+      return fetchZkConfigProvider.getVerifierKey(circuitId.split('#').pop() || circuitId);
+    },
+    getZKIR(circuitId: string) {
+      return fetchZkConfigProvider.getZKIR(circuitId.split('#').pop() || circuitId);
     }
   };
   const config = await connectedAPI.getConfiguration();
