@@ -1,0 +1,34 @@
+name: Compile Compact Contract
+on:
+  push:
+    paths:
+      - 'contracts/voting.compact'
+  workflow_dispatch:
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Compact Compiler
+        run: |
+          curl --proto '=https' --tlsv1.2 -LsSf https://github.com/midnightntwrk/compact/releases/latest/download/compact-installer.sh | sh
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          
+      - name: Update Compact Version
+        run: |
+          compact update 0.31.1 || compact update 0.31.0
+
+      - name: Compile Contract
+        run: |
+          compact compile contracts/voting.compact src/services/midnight/managed/voting
+
+      - name: Commit Compiled Assets
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add src/services/midnight/managed/voting
+          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: auto-compile voting.compact" && git push)
