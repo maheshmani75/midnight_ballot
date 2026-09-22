@@ -21,18 +21,7 @@ export const initializeProviders = async (logger: Logger) => {
   setNetworkId('preprod');
   const connectedAPI = await connectToWallet(logger, "preprod");
   const zkConfigPath = window.location.origin;
-  const fetchZkConfigProvider = new FetchZkConfigProvider(zkConfigPath, fetch.bind(window));
-  const keyMaterialProvider = {
-    getProverKey(circuitId: string) {
-      return fetchZkConfigProvider.getProverKey(circuitId.split('#').pop() || circuitId);
-    },
-    getVerifierKey(circuitId: string) {
-      return fetchZkConfigProvider.getVerifierKey(circuitId.split('#').pop() || circuitId);
-    },
-    getZKIR(circuitId: string) {
-      return fetchZkConfigProvider.getZKIR(circuitId.split('#').pop() || circuitId);
-    }
-  };
+  const keyMaterialProvider = new FetchZkConfigProvider(zkConfigPath, fetch.bind(window));
   const config = await connectedAPI.getConfiguration();
   const privateStateProvider = inMemoryPrivateStateProvider<string, VotingPrivateState>();
   const shieldedAddresses = await connectedAPI.getShieldedAddresses();

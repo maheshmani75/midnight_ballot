@@ -28,6 +28,7 @@ jobs:
           export PATH="$HOME/.local/bin:$PATH"
           compact update 0.31.1 || compact update 0.31.0
           compact compile contracts/voting.compact src/services/midnight/managed/voting
+          for f in src/services/midnight/managed/voting/keys/*; do mv "$f" "${f%/*}/voting#${f##*/}"; done
           cp -r src/services/midnight/managed/voting/keys/* public/keys/
 
       - name: Install dependencies (CLI)
