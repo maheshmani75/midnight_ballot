@@ -39,3 +39,5 @@ export circuit closePoll(): [] {
   assert(pollOpen, "poll already closed");
   pollOpen = false;
 }
+
+// Trigger compile
