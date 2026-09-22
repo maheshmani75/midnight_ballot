@@ -1,4 +1,4 @@
-import { Moon, ShieldCheck, ExternalLink } from "lucide-react";
+import { Moon, ExternalLink } from "lucide-react";
 import { WalletButton } from "./components/WalletButton";
 import { BallotCard } from "./components/BallotCard";
 import { TallyBoard } from "./components/TallyBoard";
