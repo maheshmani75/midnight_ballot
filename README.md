@@ -13,7 +13,9 @@ https://midnight-ballot.vercel.app
 |----------|----------------------------------|
 | Preprod  | `6bb081edebfb8111524a9fb09db24aafc0c11c8fe93ca40172433308b496f49e` |
 
-- ?? **Contract on Midnight Explorer:** [View Preprod Contract](https://preprod.midnightexplorer.com/contracts/0x6bb081edebfb8111524a9fb09db24aafc0c11c8fe93ca40172433308b496f49e)
+- 🔗 **Contract on Midnight Explorer:** [View Preprod Contract](https://preprod.midnightexplorer.com/contracts/0x6bb081edebfb8111524a9fb09db24aafc0c11c8fe93ca40172433308b496f49e)
+
+![Contract Explorer](./screenshots/contract-address.png)
 
 ## What This Does
 Midnight Ballot lets anyone vote on a fixed set of options without revealing *which* option they chose or linking their identity to their ballot, while still producing a tally anyone can independently verify by reading the public ledger.
