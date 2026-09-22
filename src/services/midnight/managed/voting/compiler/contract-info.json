@@ -39,6 +39,31 @@
       }
     },
     {
+      "name": "merklePath",
+      "arguments": [
+      ],
+      "result type": {
+        "type-name": "Vector",
+        "length": 5,
+        "type": {
+          "type-name": "Bytes",
+          "length": 32
+        }
+      }
+    },
+    {
+      "name": "pathDirections",
+      "arguments": [
+      ],
+      "result type": {
+        "type-name": "Vector",
+        "length": 5,
+        "type": {
+          "type-name": "Boolean"
+        }
+      }
+    },
+    {
       "name": "chosenOption",
       "arguments": [
       ],
@@ -85,8 +110,18 @@
       }
     },
     {
-      "name": "pollOpen",
+      "name": "eligibilityRoot",
       "index": 3,
+      "exported": true,
+      "storage": "Cell",
+      "type": {
+        "type-name": "Bytes",
+        "length": 32
+      }
+    },
+    {
+      "name": "pollOpen",
+      "index": 4,
       "exported": true,
       "storage": "Cell",
       "type": {

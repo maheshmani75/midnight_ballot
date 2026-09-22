@@ -2,6 +2,8 @@ import type * as __compactRuntime from '@midnight-ntwrk/compact-runtime';
 
 export type Witnesses<PS> = {
   voterSecret(context: __compactRuntime.WitnessContext<Ledger, PS>): [PS, Uint8Array];
+  merklePath(context: __compactRuntime.WitnessContext<Ledger, PS>): [PS, Uint8Array[]];
+  pathDirections(context: __compactRuntime.WitnessContext<Ledger, PS>): [PS, boolean[]];
   chosenOption(context: __compactRuntime.WitnessContext<Ledger, PS>): [PS, bigint];
 }
 
@@ -37,6 +39,7 @@ export type Ledger = {
     member(elem_0: Uint8Array): boolean;
     [Symbol.iterator](): Iterator<Uint8Array>
   };
+  readonly eligibilityRoot: Uint8Array;
   readonly pollOpen: boolean;
 }
 
@@ -51,7 +54,8 @@ export declare class Contract<PS = any, W extends Witnesses<PS> = Witnesses<PS>>
   provableCircuits: ProvableCircuits<PS>;
   constructor(witnesses: W);
   initialState(context: __compactRuntime.ConstructorContext<PS>,
-               numOptions_0: bigint): __compactRuntime.ConstructorResult<PS>;
+               numOptions_0: bigint,
+               root_0: Uint8Array): __compactRuntime.ConstructorResult<PS>;
 }
 
 export declare function ledger(state: __compactRuntime.StateValue | __compactRuntime.ChargedState): Ledger;
