@@ -1,0 +1,8 @@
+{
+  "network": "preprod",
+  "contractAddress": "6bb081edebfb8111524a9fb09db24aafc0c11c8fe93ca40172433308b496f49e",
+  "explorerUrl": "https://preprod.midnight.network/contract/6bb081edebfb8111524a9fb09db24aafc0c11c8fe93ca40172433308b496f49e",
+  "indexer": "https://indexer.preprod.midnight.network/api/v4/graphql",
+  "node": "https://rpc.preprod.midnight.network",
+  "deployedAt": "2026-09-15T18:27:43.645Z"
+}
