@@ -3,7 +3,6 @@ import { WitnessContext } from "@midnight-ntwrk/midnight-js-protocol/compact-run
 
 export type VotingPrivateState = {
   readonly secretKey: Uint8Array;
-  readonly selectedOption: bigint;
 };
 
 export const witnesses = {
@@ -11,8 +10,16 @@ export const witnesses = {
     privateState,
     privateState.secretKey,
   ],
+  merklePath: ({ privateState }: WitnessContext<Ledger, VotingPrivateState>): [VotingPrivateState, any] => [
+    privateState,
+    new Array(5).fill(new Uint8Array(32)),
+  ],
+  pathDirections: ({ privateState }: WitnessContext<Ledger, VotingPrivateState>): [VotingPrivateState, any] => [
+    privateState,
+    new Array(5).fill(false),
+  ],
   chosenOption: ({ privateState }: WitnessContext<Ledger, VotingPrivateState>): [VotingPrivateState, bigint] => [
     privateState,
-    privateState.selectedOption,
+    0n,
   ],
 };
