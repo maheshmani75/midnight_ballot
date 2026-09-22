@@ -21,7 +21,13 @@ export const initializeProviders = async (logger: Logger) => {
   setNetworkId('preprod');
   const connectedAPI = await connectToWallet(logger, "preprod");
   const zkConfigPath = window.location.origin;
-  const keyMaterialProvider = new FetchZkConfigProvider(zkConfigPath, fetch.bind(window));
+  const fetchZkConfigProvider = new FetchZkConfigProvider(zkConfigPath, fetch.bind(window));
+  const keyMaterialProvider = {
+    getZkConfig(circuitId: string) {
+      const parsedCircuitId = circuitId.split('#').pop() || circuitId;
+      return fetchZkConfigProvider.getZkConfig(parsedCircuitId);
+    }
+  };
   const config = await connectedAPI.getConfiguration();
   const privateStateProvider = inMemoryPrivateStateProvider<string, VotingPrivateState>();
   const shieldedAddresses = await connectedAPI.getShieldedAddresses();
@@ -29,8 +35,8 @@ export const initializeProviders = async (logger: Logger) => {
   return {
     userAddress: shieldedAddresses.shieldedAddress,
     privateStateProvider,
-    zkConfigProvider: keyMaterialProvider,
-    proofProvider: httpClientProofProvider(config.proverServerUri!, keyMaterialProvider),
+    zkConfigProvider: keyMaterialProvider as any,
+    proofProvider: httpClientProofProvider(config.proverServerUri!, keyMaterialProvider as any),
     publicDataProvider: indexerPublicDataProvider(config.indexerUri, config.indexerWsUri, globalThis.WebSocket as any),
     walletProvider: {
       getCoinPublicKey(): string {
